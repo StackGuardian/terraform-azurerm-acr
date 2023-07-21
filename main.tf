@@ -1,4 +1,4 @@
-resource "azurerm_container_registry" "this" {
+resource "azurerm_container_registry" "acr" {
   name                = var.registry_name
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -17,7 +17,7 @@ resource "azurerm_container_registry" "this" {
   tags = var.tags
 }
 
-resource "azurerm_container_registry_webhook" "this" {
+resource "azurerm_container_registry_webhook" "acr-webhook" {
   for_each = var.webhooks
 
   name                = each.value.name
@@ -33,7 +33,7 @@ resource "azurerm_container_registry_webhook" "this" {
   tags = var.tags
 }
 
-resource "azurerm_monitor_diagnostic_setting" "this" {
+resource "azurerm_monitor_diagnostic_setting" "acr-monitor" {
   name                           = var.diagnostic_setting_name
   target_resource_id             = azurerm_container_registry.this.id
   log_analytics_workspace_id     = var.log_analytics_workspace_id
