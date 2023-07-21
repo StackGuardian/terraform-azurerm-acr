@@ -1,6 +1,6 @@
 resource "azurerm_container_registry" "acr" {
   name                = var.registry_name
-  location            = var.location
+  location            = var.location  
   resource_group_name = var.resource_group_name
   sku                 = var.sku
   admin_enabled       = var.admin_enabled
@@ -17,43 +17,3 @@ resource "azurerm_container_registry" "acr" {
   tags = var.tags
 }
 
-resource "azurerm_container_registry_webhook" "acr-webhook" {
-  for_each = var.webhooks
-
-  name                = each.value.name
-  registry_name       = azurerm_container_registry.this.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-
-  service_uri = each.value.service_uri
-  actions     = each.value.actions
-  status      = each.value.status
-  scope       = each.value.scope
-
-  tags = var.tags
-}
-
-resource "azurerm_monitor_diagnostic_setting" "acr-monitor" {
-  name                           = var.diagnostic_setting_name
-  target_resource_id             = azurerm_container_registry.this.id
-  log_analytics_workspace_id     = var.log_analytics_workspace_id
-  log_analytics_destination_type = var.log_analytics_destination_type
-
-  dynamic "enabled_log" {
-    for_each = toset(var.diagnostic_setting_enabled_log_categories)
-
-    content {
-      category = enabled_log.value
-    }
-  }
-
-  metric {
-    category = "AllMetrics"
-    enabled  = true
-
-    retention_policy {
-      days    = 0
-      enabled = false
-    }
-  }
-}
